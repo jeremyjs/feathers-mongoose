@@ -21,6 +21,7 @@ class Service {
     this.paginate = options.paginate || {};
     this.lean = options.lean || false;
     this.overwrite = (options.overwrite === false) ? false : true;
+    this.softDelete = options.softDelete || false;
   }
 
   extend(obj) {
@@ -207,11 +208,13 @@ class Service {
       query[this.id] = id;
     }
 
+    const remove = this.softDelete ? 'delete' : 'remove';
+
     // NOTE (EK): First fetch the record(s) so that we can return
     // it/them when we delete it/them.
     return this._getOrFind(id, params)
       .then(data => this.Model
-        .remove(query)
+        [remove](query)
         .lean(this.lean)
         .exec()
         .then(() => data)
